@@ -11,7 +11,7 @@
       hci-effects = hercules-ci-effects.lib.withPkgs pkgs;
     in
     {
-      packages.${system}.gh-pages = pkgs.runCommandNoCC "generate-gh-pages"
+      packages.${system}.gh-pages = pkgs.runCommandNoCC "generate-gh-pages" {}
         ''
           mkdir $out
           echo "<h1>This is a GH page</h1>" > $out/index.html
