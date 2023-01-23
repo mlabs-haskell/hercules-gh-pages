@@ -18,7 +18,7 @@
         '';
 
       effects = src: {
-        gh-pages = hci-effects.runIf (src.ref == "refs/heads/main" || src.ref == "refs/heads/master") (
+        gh-pages = builtins.trace (builtins.toJSON src) (hci-effects.runIf (src.ref == "refs/heads/main" || src.ref == "refs/heads/master") (
           hci-effects.mkEffect {
             buildInputs = with pkgs; [ openssh git ];
             secretsMap = {
@@ -42,7 +42,7 @@
                 git push -f origin gh-pages:gh-pages
               '';
           }
-        );
+        ));
       };
     };
 }
