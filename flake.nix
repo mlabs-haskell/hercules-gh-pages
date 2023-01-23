@@ -17,7 +17,7 @@
           echo "<h1>This is a GH page</h1>" > $out/index.html
         '';
 
-      effects = { src }: {
+      effects = src: {
         gh-pages = hci-effects.runIf (src.ref == "refs/heads/main" || src.ref == "refs/heads/master") (
           hci-effects.mkEffect {
             buildInputs = with pkgs; [ openssh git ];
