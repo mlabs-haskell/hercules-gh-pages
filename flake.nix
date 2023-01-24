@@ -48,7 +48,8 @@
                   in
                   ''
                     set -x
-                    ORIGIN=`echo ${primaryRepo.remoteHttpUrl} | sed 's#https://#https://https://${primaryRepo.owner}:`readSecretString git .token`@#'`
+                    TOKEN=`readSecretString git .token`
+                    ORIGIN=`echo ${primaryRepo.remoteHttpUrl} | sed 's#://#://${primaryRepo.owner}:$TOKEN@#'`
                     echo ${githubHostKey} >> ~/.ssh/known_hosts
                     export GIT_COMMITTER_NAME="${committer.name}"
                     export GIT_COMMITTER_EMAIL="${committer.email}"
