@@ -22,7 +22,7 @@
           hci-effects.mkEffect {
             buildInputs = with pkgs; [ openssh git ];
             secretsMap = {
-              "clarity-ctl-types-github-deploy-ssh" = "ssh";
+              "ssh" = "clarity-ctl-types-github-deploy-ssh";
             };
             effectScript =
               let
