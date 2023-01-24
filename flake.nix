@@ -17,7 +17,7 @@
           echo "<h1>This is a GH page</h1>" > $out/index.html
         '';
 
-      herculesCI = { primaryRepo }: {
+      herculesCI = { primaryRepo, ... }: {
         onPush.gh-pages.outputs.effects.default =
           hci-effects.runIf (primaryRepo.ref == "refs/heads/main" || primaryRepo.ref == "refs/heads/master") (
             hci-effects.mkEffect {
