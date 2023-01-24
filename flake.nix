@@ -22,7 +22,7 @@
           hci-effects.mkEffect {
             buildInputs = with pkgs; [ openssh git ];
             secretsMap = {
-              "ci-hercules-mlabs-haskell-github-ssh-key" = "ssh";
+              "clarity-ctl-types-github-deploy-ssh" = "ssh";
             };
             effectScript =
               let
