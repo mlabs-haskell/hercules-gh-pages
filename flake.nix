@@ -16,7 +16,7 @@
       # mkGhPagesBuilder ::
       #   { gh-pages :: Derivation
       #   , branchName :: String
-      #   , allowedRefs :: [String]
+      #   , condition :: Repo -> Boolean
       #   , committer :: { name :: String, email :: String } ? <default value> }
       #   } ->
       #   HerculesCIArgs ->
@@ -25,7 +25,7 @@
         {
           gh-pages,
           branchName ? "gh-pages",
-          allowedRefs ? ["refs/heads/main" "refs/heads/master"],
+          condition ? { ref, ... }: lib.elem ref ["refs/heads/main" "refs/heads/master"],
           committer ? {
             name = "Andrey Vlasov";
             email = "andreyvlasov+gh-pages-builder@mlabs.city";
@@ -34,7 +34,7 @@
         { primaryRepo, ... }:
         {
           onPush.gh-pages.outputs.effects.default =
-            hci-effects.runIf (lib.elem primaryRepo.ref allowedRefs) (
+            hci-effects.runIf (condition primaryRepo) (
               hci-effects.mkEffect {
                 buildInputs = with pkgs; [ openssh git ];
                 secretsMap = {
