@@ -17,8 +17,7 @@
       #   { gh-pages :: Derivation
       #   , branchName :: String
       #   , allowedRefs :: [String]
-      #   , comitter :: { name :: String, email :: String } ? <default value> }
-      #   , author :: { name :: String | null, email :: String | null } ? <default value>
+      #   , committer :: { name :: String, email :: String } ? <default value> }
       #   } ->
       #   HerculesCIArgs ->
       #   { onPush.gh-pages.outputs.effects.default :: Effect }
@@ -30,10 +29,6 @@
           committer ? {
             name = "Andrey Vlasov";
             email = "andreyvlasov+gh-pages-builder@mlabs.city";
-          },
-          author ? {
-            name = "`git log --format=format:%aN -n 1`";
-            email = "`git log --format=format:%aE -n 1`";
           }
         }:
         { primaryRepo, ... }:
@@ -56,14 +51,8 @@
                     echo ${githubHostKey} >> ~/.ssh/known_hosts
                     export GIT_COMMITTER_NAME="${committer.name}"
                     export GIT_COMMITTER_EMAIL="${committer.email}"
-                    ${optionalString (author?name && author.name != null)
-                      ''
-                      export GIT_AUTHOR_NAME="${author.name}"
-                      ''}
-                    ${optionalString (author?email && author.email != null)
-                      ''
-                      export GIT_AUTHOR_EMAIL="${author.email}"
-                      ''}
+                    export GIT_AUTHOR_NAME="${committer.name}"
+                    export GIT_AUTHOR_EMAIL="${committer.email}"
                     cp -r --no-preserve=mode ${gh-pages} ./gh-pages && cd gh-pages
                     git init -b ${branchName}
                     git remote add origin $ORIGIN
