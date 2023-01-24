@@ -36,7 +36,7 @@
                 export EMAIL="github@croughan.sh"
                 cp -r --no-preserve=mode ${self.packages.${system}.gh-pages} ./gh-pages && cd gh-pages
                 git init -b gh-pages
-                git remote add origin https://mlabs-haskell:`readSecretString git .token`/mlabs-haskell/hercules-gh-pages.git
+                git remote add origin https://mlabs-haskell:`readSecretString git .token`@github.com/mlabs-haskell/hercules-gh-pages.git
                 git add .
                 git commit -m "Deploy to gh-pages"
                 git push -f origin gh-pages:gh-pages
