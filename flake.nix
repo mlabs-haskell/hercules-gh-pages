@@ -18,11 +18,11 @@
         '';
 
       effects = src: {
-        gh-pages = builtins.trace (builtins.toJSON src) (hci-effects.runIf (src.ref == "refs/heads/main" || src.ref == "refs/heads/master") (
+        gh-pages = hci-effects.runIf (src.ref == "refs/heads/main" || src.ref == "refs/heads/master") (
           hci-effects.mkEffect {
             buildInputs = with pkgs; [ openssh git ];
             secretsMap = {
-              "ssh" = "ssh";
+              "ci-hercules-mlabs-haskell-github-ssh-key" = "ssh";
             };
             effectScript =
               let
@@ -36,13 +36,13 @@
                 export EMAIL="github@croughan.sh"
                 cp -r --no-preserve=mode ${self.packages.${system}.gh-pages} ./gh-pages && cd gh-pages
                 git init -b gh-pages
-                git remote add origin git@github.com:Plutonomicon/plutonomicon.git
+                git remote add origin git@github.com:mlabs-haskell/hercules-gh-pages.git
                 git add .
                 git commit -m "Deploy to gh-pages"
                 git push -f origin gh-pages:gh-pages
               '';
           }
-        ));
+        );
       };
     };
 }
