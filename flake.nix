@@ -42,14 +42,16 @@
                 };
 
                 # Env variables
-                inherit branchName gh-pages;
+                inherit branchName;
                 inherit (primaryRepo) owner remoteHttpUrl;
                 committerName = committer.name;
                 committerEmail = committer.email;
                 githubHostKey = "github.com ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==";
+                ghPages = gh-pages;
 
                 effectScript =
                   ''
+                    set -e
                     set -x
                     TOKEN=`readSecretString git .token`
                     ORIGIN=`echo $remoteHttpUrl | sed "s#://#://$owner:$TOKEN@#"`
@@ -58,7 +60,7 @@
                     export GIT_COMMITTER_EMAIL="$committerEmail"
                     export GIT_AUTHOR_NAME="$committerName"
                     export GIT_AUTHOR_EMAIL="$committerEmail"
-                    cp -r --no-preserve=mode $gh-pages ./gh-pages && cd gh-pages
+                    cp -r --no-preserve=mode $ghPages ./gh-pages && cd gh-pages
                     git init -b $branchName
                     git remote add origin $ORIGIN
                     git add .
