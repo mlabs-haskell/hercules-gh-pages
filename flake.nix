@@ -26,7 +26,7 @@
         {
           gh-pages,
           branchName ? "gh-pages",
-          allowedRefs ? ["refs/heads/main" "refs/heads/master"]
+          allowedRefs ? ["refs/heads/main" "refs/heads/master"],
           committer ? {
             name = "Andrey Vlasov";
             email = "andreyvlasov+gh-pages-builder@mlabs.city";
