@@ -10,11 +10,13 @@
       pkgs = nixpkgs.legacyPackages.${system};
       hci-effects = hercules-ci-effects.lib.withPkgs pkgs;
 
+      inherit (nixpkgs) lib;
       inherit (nixpkgs.lib) optionalString;
 
       # mkGhPagesBuilder ::
       #   { gh-pages :: Derivation
       #   , branchName :: String
+      #   , allowedRefs :: [String]
       #   , comitter :: { name :: String, email :: String } ? <default value> }
       #   , author :: { name :: String | null, email :: String | null } ? <default value>
       #   } ->
@@ -24,6 +26,7 @@
         {
           gh-pages,
           branchName ? "gh-pages",
+          allowedRefs ? ["refs/heads/main" "refs/heads/master"]
           committer ? {
             name = "Andrey Vlasov";
             email = "andreyvlasov+gh-pages-builder@mlabs.city";
@@ -36,7 +39,7 @@
         { primaryRepo, ... }:
         {
           onPush.gh-pages.outputs.effects.default =
-            hci-effects.runIf (primaryRepo.ref == "refs/heads/main" || primaryRepo.ref == "refs/heads/master") (
+            hci-effects.runIf (lib.elem primaryRepo.ref allowedRefs) (
               hci-effects.mkEffect {
                 buildInputs = with pkgs; [ openssh git ];
                 secretsMap = {
@@ -49,7 +52,7 @@
                   ''
                     set -x
                     TOKEN=`readSecretString git .token`
-                    ORIGIN=`echo ${primaryRepo.remoteHttpUrl} | sed 's#://#://${primaryRepo.owner}:$TOKEN@#'`
+                    ORIGIN=`echo ${primaryRepo.remoteHttpUrl} | sed "s#://#://${primaryRepo.owner}:$TOKEN@#"`
                     echo ${githubHostKey} >> ~/.ssh/known_hosts
                     export GIT_COMMITTER_NAME="${committer.name}"
                     export GIT_COMMITTER_EMAIL="${committer.email}"
