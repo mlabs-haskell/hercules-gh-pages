@@ -71,6 +71,8 @@
                       git add .
                       git commit -m "Deploy to $branchName"
                       git push -f origin $branchName:$branchName
+                    else
+                      echo "Nothing to commit"
                     fi
                   '';
               }
