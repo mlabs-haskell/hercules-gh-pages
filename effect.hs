@@ -3,22 +3,23 @@
 module Main (main) where
 
 import Control.Monad (when)
-import qualified Data.Text as Text
-import System.Environment
+import Data.Text (Text)
 import Text.URI
-import Turtle (fromText)
+import Turtle (MonadIO, fromText)
 import Turtle.Prelude
 import Turtle.Line (lineToText)
-import Turtle.Shell (FoldShell(FoldShell), foldShell, liftIO, sh)
+import Turtle.Shell (FoldShell(FoldShell), foldShell, sh)
 
+need' :: (MonadIO m, MonadFail m) => Text -> (Text -> m a) -> m a
 need' e f = do
   mb <- need e
   case mb of
     Nothing -> fail "need': Nothing"
     Just s -> f s
 
-fromRightM _ (Right ok) = pure ok
-fromRightM e (Left _) = fail e
+fromRightM :: (MonadFail m, Show e) => Either e a -> m a
+fromRightM (Right ok) = pure ok
+fromRightM (Left e) = fail $ "fromRightM: " <> show e
 
 main :: IO ()
 main = sh do
@@ -29,7 +30,7 @@ main = sh do
   rewriteHistory <- need' "rewriteHistory" (pure . (== "1"))
 
   token <- inshell "readSecretString git .token" mempty >>= mkPassword . lineToText
-  authority <- fromRightM "uriAuthority is Left _" $ uriAuthority remoteHttpUrl
+  authority <- fromRightM $ uriAuthority remoteHttpUrl
   let origin = remoteHttpUrl { uriAuthority = Right authority { authUserInfo = Just UserInfo { uiUsername = owner, uiPassword = Just token } } }
   if rewriteHistory then do
     mkdir "gh-pages"
@@ -45,13 +46,13 @@ main = sh do
   -- procs "cp" ["-r", "--no-preserve=mode", "-T", ghPages, "."] mempty
   cptreeL (fromText ghPages) "."
   hasChanges <-
-    foldShell (shells "git status --porcelain" mempty) $
+    foldShell (procs "git" ["status", "--porcelain"] mempty) $
       FoldShell
         (\_ _ -> pure True)
         False
         pure
   if hasChanges then do
-    shells "git add ." mempty
+    procs "git" ["add", "."] mempty
     procs "git" ["commit", "-m", "Deploy to " <> branchName] mempty
     procs "git" ["push", "-f", "origin", branchName] mempty
   else echo "Nothing to commit"
