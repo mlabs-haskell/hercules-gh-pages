@@ -77,7 +77,8 @@ type GhPagesConfig =
       -- you probably want to change these
   , rewriteHistory :: Boolean ? true
       -- if true, script resets history on target branch to a single (newest) commit
-      -- if you need history preserved, change this to false
+      -- if you need history preserved, change this to false; in this case, target branch must exists on remote
+      -- otherwise the script will fail
   }
 
 pkgs.mkGhPagesEffect ::
