@@ -53,9 +53,10 @@ If you only have `herculesCI.ciSystems = ...;` and wondering what is this `hercu
 -herculesCI.ciSystems = ...;
 +herculesCI = herculesEnv: {
 +  ciSystems = ...;
-+  pkgs.mkGhPagesEffect
-+    { inherit (self.packages.${system}) gh-pages; }
-+    herculesEnv;
++  onPush.gh-pages.outputs.effects.default =
++    pkgs.mkGhPagesEffect
++      { inherit (self.packages.${system}) gh-pages; }
++      herculesEnv;
 +};
 ```
 
