@@ -84,6 +84,6 @@
           echo "<h1>This is a GH page</h1>" > $out/index.html
         '';
 
-      herculesCI = mkGhPagesBuilder { inherit (self.packages.${system}) gh-pages; };
+      herculesCI = mkGhPagesBuilder { inherit (self.packages.${system}) gh-pages; rewriteHistory = false; };
     };
 }
