@@ -16,8 +16,9 @@
         };
         mkGhPagesEffect =
           let
-            inherit (final) lib mkEffect runIf;
+            inherit (final) lib;
             inherit (final.lib) optionalString;
+            inherit (final.effects) mkEffect runIf;
           in
           { gh-pages
           , branchName ? "gh-pages"
