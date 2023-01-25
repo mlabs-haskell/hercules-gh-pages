@@ -31,6 +31,13 @@ instance FromJSON Secrets where
         git .: "data" >>= withObject "data" \data_ ->
           Secrets <$> data_ .: "token"
 
+shellStdoutNonEmpty :: FoldShell a Bool
+shellStdoutNonEmpty =
+  FoldShell
+    (\_ _ -> pure True)
+    False
+    pure
+
 main :: IO ()
 main = sh do
   secretsPath <- need' "HERCULES_CI_SECRETS_JSON"
@@ -55,17 +62,17 @@ main = sh do
   else do
     procs "git" ["clone", "--branch", branchName, "--single-branch", render origin, "gh-pages"] mempty
     cd "gh-pages"
-  ls "." >>= \f ->
-    when (f /= ".git") do
-      rmtree f
+  -- let currentGit = ".git"
+  --     backupGit = "../.git"
+  -- ls "." >>= \f ->
+  --   if f == currentGit
+  --     then mv currentGit backupGit
+  --     else rmtree f
   -- procs "cp" ["-r", "--no-preserve=mode", "-T", ghPages, "."] mempty
   cptreeL (fromText ghPages) "."
+  -- mv backupGit currentGit
   hasChanges <-
-    foldShell (procs "git" ["status", "--porcelain"] mempty) $
-      FoldShell
-        (\_ _ -> pure True)
-        False
-        pure
+    foldShell (procs "git" ["status", "--porcelain"] mempty) shellStdoutNonEmpty
   if hasChanges then do
     procs "git" ["add", "."] mempty
     procs "git" ["commit", "-m", "Deploy to " <> branchName] mempty
