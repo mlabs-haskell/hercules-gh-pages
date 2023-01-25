@@ -63,7 +63,7 @@
                       git init --initial-branch $branchName
                       git remote add origin $ORIGIN
                     else
-                      git clone --branch $branchName $ORIGIN
+                      git clone --branch $branchName --single-branch $ORIGIN gh-pages
                       cd gh-pages
                     fi
                     cp -r --no-preserve=mode $ghPages .
