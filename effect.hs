@@ -37,6 +37,8 @@ shellStdoutNonEmpty =
     False
     pure
 
+ghPagesDir = "gh-pages"
+
 main :: IO ()
 main = sh do
   secretsPath <- need' "HERCULES_CI_SECRETS_JSON"
@@ -54,22 +56,20 @@ main = sh do
   authority <- fromRightM $ uriAuthority remoteHttpUrl
   let origin = remoteHttpUrl { uriAuthority = Right authority { authUserInfo = Just UserInfo { uiUsername = owner, uiPassword = Just gitTokenPassword } } }
   if rewriteHistory then do
-    mkdir "gh-pages"
-    cd "gh-pages"
+    mkdir ghPagesDir
+    cd ghPagesDir
     procs "git" ["init", "--initial-branch", branchName] mempty
     procs "git" ["remote", "add", "origin", render origin] mempty
   else do
-    procs "git" ["clone", "--branch", branchName, "--single-branch", render origin, "gh-pages"] mempty
-    cd "gh-pages"
+    procs "git" ["clone", "--branch", branchName, "--single-branch", render origin, ghPagesDir] mempty
+    cd ghPagesDir
   let currentGit = ".git"
       backupGit = "../.git"
-  ls "." >>= \f ->
-    if f == "./" <> currentGit
-      then mv currentGit backupGit
-      else rmtree f
+  mv currentGit backupGit
+  ls "." >>= rmtree
   -- procs "cp" ["-r", "--no-preserve=mode", "-T", ghPages, "."] mempty
   cptreeL (fromText ghPages) "."
-  -- mv backupGit currentGit
+  mv backupGit currentGit
   hasChanges <-
     foldShell (inproc "git" ["status", "--porcelain"] mempty) shellStdoutNonEmpty
   if hasChanges then do
