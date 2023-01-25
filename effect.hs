@@ -29,7 +29,7 @@ main = sh do
   remoteHttpUrl <- need' "remoteHttpUrl" mkURI
   rewriteHistory <- need' "rewriteHistory" (pure . (== "1"))
 
-  token <- inshell "readSecretString git .token" mempty >>= mkPassword . lineToText
+  token <- inproc "readSecretString" ["git", ".token"] mempty >>= mkPassword . lineToText
   authority <- fromRightM $ uriAuthority remoteHttpUrl
   let origin = remoteHttpUrl { uriAuthority = Right authority { authUserInfo = Just UserInfo { uiUsername = owner, uiPassword = Just token } } }
   if rewriteHistory then do
