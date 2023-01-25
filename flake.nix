@@ -1,14 +1,7 @@
 {
-  inputs = {
-    nixpkgs.url = github:NixOS/nixpkgs/nixos-unstable;
-    hercules-ci-effects.url = github:hercules-ci/hercules-ci-effects;
-  };
+  description = "A HerculesCI effect for deploying docs to Github pages";
 
-  outputs = { self, nixpkgs, hercules-ci-effects }:
-    let
-      system = "x86_64-linux";
-      pkgs = import nixpkgs { inherit system; overlays = [ hercules-ci-effects.overlay self.overlays.default ]; };
-    in
+  outputs = { self }:
     {
       overlays.default = final: prev: {
         mkGhPagesJob = config: herculesEnv: {
@@ -32,7 +25,7 @@
           { primaryRepo, ... }:
           runIf (condition primaryRepo) (
             mkEffect {
-              buildInputs = with pkgs; [ openssh git ];
+              buildInputs = with final; [ openssh git ];
               secretsMap = {
                 git = { type = "GitToken"; };
               };
@@ -76,13 +69,5 @@
             }
           );
       };
-
-      packages.${system}.gh-pages = pkgs.runCommandNoCC "generate-gh-pages" { }
-        ''
-          mkdir $out
-          echo "<h1>This is a GH page</h1>" > $out/index.html
-        '';
-
-      herculesCI = pkgs.mkGhPagesJob { inherit (self.packages.${system}) gh-pages; rewriteHistory = false; };
     };
 }
