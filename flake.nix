@@ -49,7 +49,7 @@
 
               effectScript = final.writers.writeHaskell
                 "effect.hs"
-                { libraries = with final.haskellPackages; [modern-uri turtle]; }
+                { libraries = with final.haskellPackages; [aeson modern-uri turtle]; }
                 ./effect.hs;
             }
           );
