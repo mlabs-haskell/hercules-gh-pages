@@ -11,12 +11,12 @@ import Turtle (MonadIO, fromText)
 import Turtle.Prelude
 import Turtle.Shell (FoldShell(FoldShell), foldShell, sh, liftIO)
 
-need' :: (MonadIO m, MonadFail m) => Text -> (Text -> m a) -> m a
-need' e f = do
+need' :: (MonadIO m, MonadFail m) => Text -> m Text
+need' e = do
   mb <- need e
   case mb of
     Nothing -> fail "need': Nothing"
-    Just s -> f s
+    Just s -> pure s
 
 fromRightM :: (MonadFail m, Show e) => Either e a -> m a
 fromRightM (Right ok) = pure ok
@@ -29,21 +29,20 @@ instance FromJSON Secrets where
     withObject "secrets" \secrets ->
       secrets .: "git" >>= withObject "git" \git ->
         git .: "data" >>= withObject "data" \data_ ->
-          data_ .: "token"
+          Secrets <$> data_ .: "token"
 
 main :: IO ()
 main = sh do
-  secretsPath <- need' "HERCULES_CI_SECRETS_JSON" pure
-  liftIO $ putStrLn =<< readFile (Text.unpack secretsPath)
+  secretsPath <- need' "HERCULES_CI_SECRETS_JSON"
   Secrets {gitToken} <- liftIO $ eitherDecodeFileStrict' (Text.unpack secretsPath) >>= \case
     Left e -> fail $ show e
     Right ok -> pure ok
 
-  branchName <- need' "branchName" pure
-  ghPages <- need' "gh-pages" pure
-  owner <- need' "owner" mkUsername
-  remoteHttpUrl <- need' "remoteHttpUrl" mkURI
-  rewriteHistory <- need' "rewriteHistory" (pure . (== "1"))
+  branchName <- need' "branchName"
+  ghPages <- need' "gh-pages"
+  owner <- need' "owner" >>= mkUsername
+  remoteHttpUrl <- need' "remoteHttpUrl" >>= mkURI
+  rewriteHistory <- (== "1") <$> need' "rewriteHistory"
 
   gitTokenPassword <- mkPassword gitToken
   authority <- fromRightM $ uriAuthority remoteHttpUrl
