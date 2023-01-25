@@ -62,12 +62,12 @@ main = sh do
   else do
     procs "git" ["clone", "--branch", branchName, "--single-branch", render origin, "gh-pages"] mempty
     cd "gh-pages"
-  -- let currentGit = ".git"
-  --     backupGit = "../.git"
-  -- ls "." >>= \f ->
-  --   if f == currentGit
-  --     then mv currentGit backupGit
-  --     else rmtree f
+  let currentGit = ".git"
+      backupGit = "../.git"
+  ls "." >>= \f ->
+    if f == "./" <> currentGit
+      then mv currentGit backupGit
+      else rmtree f
   -- procs "cp" ["-r", "--no-preserve=mode", "-T", ghPages, "."] mempty
   cptreeL (fromText ghPages) "."
   -- mv backupGit currentGit
