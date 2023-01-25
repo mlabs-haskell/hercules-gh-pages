@@ -68,7 +68,7 @@
                     fi
                     cp -r --no-preserve=mode $ghPages .
                     git add .
-                    git commit -m "Deploy to $branchName"
+                    git commit -m "Deploy to $branchName" --allow-empty
                     git push -f origin $branchName:$branchName
                   '';
               }
