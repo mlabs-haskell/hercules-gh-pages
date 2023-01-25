@@ -71,8 +71,8 @@ main = sh do
       backupGit = "../.git"
   mv currentGit backupGit
   ls "." >>= rmtree
-  -- procs "cp" ["-r", "--no-preserve=mode", "-T", ghPages, "."] mempty
-  cptreeL (fromText ghPages) "."
+  procs "cp" ["-r", "--no-preserve=mode", "-T", ghPages, "."] mempty
+  -- cptreeL (fromText ghPages) "."
   mv backupGit currentGit
   hasChanges <-
     foldShell (inproc "git" ["status", "--porcelain"] mempty) shellStdoutNonEmpty
