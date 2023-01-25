@@ -1,9 +1,11 @@
-{-# LANGUAGE BlockArguments, OverloadedStrings #-}
+{-# LANGUAGE BlockArguments, LambdaCase, OverloadedStrings #-}
 
 module Main (main) where
 
 import Control.Monad (when)
+import Data.Aeson
 import Data.Text (Text)
+import qualified Data.Text as Text (unpack)
 import Text.URI
 import Turtle (MonadIO, fromText)
 import Turtle.Prelude
@@ -23,7 +25,11 @@ fromRightM (Left e) = fail $ "fromRightM: " <> show e
 
 main :: IO ()
 main = sh do
-  liftIO . print =<< need "HERCULES_CI_SECRETS_JSON"
+  secretsPath <- need' "HERCULES_CI_SECRETS_JSON" pure
+  liftIO $ putStrLn =<< readFile (Text.unpack secretsPath)
+  -- () <- liftIO $ eitherDecodeFileStrict' (Text.unpack secretsPath) >>= \case
+  --   Left e -> fail $ show e
+  --   Right ok -> pure ok
 
   branchName <- need' "branchName" pure
   ghPages <- need' "gh-pages" pure
