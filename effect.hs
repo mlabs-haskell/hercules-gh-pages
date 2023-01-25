@@ -8,7 +8,7 @@ import Text.URI
 import Turtle (MonadIO, fromText)
 import Turtle.Prelude
 import Turtle.Line (lineToText)
-import Turtle.Shell (FoldShell(FoldShell), foldShell, sh)
+import Turtle.Shell (FoldShell(FoldShell), foldShell, sh, liftIO)
 
 need' :: (MonadIO m, MonadFail m) => Text -> (Text -> m a) -> m a
 need' e f = do
@@ -23,6 +23,8 @@ fromRightM (Left e) = fail $ "fromRightM: " <> show e
 
 main :: IO ()
 main = sh do
+  liftIO . print =<< need "PATH"
+
   branchName <- need' "branchName" pure
   ghPages <- need' "gh-pages" pure
   owner <- need' "owner" mkUsername
