@@ -2,7 +2,6 @@
 
 module Main (main) where
 
-import Control.Monad (when)
 import Data.Aeson (FromJSON(parseJSON), eitherDecodeFileStrict', withObject, (.:))
 import Data.Text (Text)
 import qualified Data.Text as Text (unpack)
@@ -31,10 +30,10 @@ instance FromJSON Secrets where
         git .: "data" >>= withObject "data" \data_ ->
           Secrets <$> data_ .: "token"
 
-shellStdoutNonEmpty :: FoldShell a Bool
+shellStdoutNonEmpty :: (Eq a, Monoid a) => FoldShell a Bool
 shellStdoutNonEmpty =
   FoldShell
-    (\_ _ -> pure True)
+    (\acc line -> pure (acc || line /= mempty))
     False
     pure
 
@@ -72,7 +71,7 @@ main = sh do
   cptreeL (fromText ghPages) "."
   -- mv backupGit currentGit
   hasChanges <-
-    foldShell (procs "git" ["status", "--porcelain"] mempty) shellStdoutNonEmpty
+    foldShell (inproc "git" ["status", "--porcelain"] mempty) shellStdoutNonEmpty
   if hasChanges then do
     procs "git" ["add", "."] mempty
     procs "git" ["commit", "-m", "Deploy to " <> branchName] mempty
