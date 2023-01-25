@@ -53,15 +53,20 @@
                 effectScript =
                   ''
                     set -e
-
-                    echo "<$rewriteHistory>"
-
                     TOKEN=`readSecretString git .token`
                     ORIGIN=`echo $remoteHttpUrl | sed "s#://#://$owner:$TOKEN@#"`
                     echo githubHostKey >> ~/.ssh/known_hosts
-                    cp -r --no-preserve=mode $ghPages ./gh-pages && cd gh-pages
-                    git init -b $branchName
-                    git remote add origin $ORIGIN
+                    if [[ $rewriteHistory -eq 1 ]]
+                    then
+                      mkdir ./gh-pages
+                      cd gh-pages
+                      git init --initial-branch $branchName
+                      git remote add origin $ORIGIN
+                    else
+                      git clone --branch $branchName $ORIGIN
+                      cd gh-pages
+                    fi
+                    cp -r --no-preserve=mode $ghPages .
                     git add .
                     git commit -m "Deploy to $branchName"
                     git push -f origin $branchName:$branchName
