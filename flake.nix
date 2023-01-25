@@ -54,7 +54,7 @@
                   ''
                     set -e
 
-                    echo <$rewriteHistory>
+                    echo "<$rewriteHistory>"
 
                     TOKEN=`readSecretString git .token`
                     ORIGIN=`echo $remoteHttpUrl | sed "s#://#://$owner:$TOKEN@#"`
