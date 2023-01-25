@@ -23,7 +23,7 @@ fromRightM (Left e) = fail $ "fromRightM: " <> show e
 
 main :: IO ()
 main = sh do
-  liftIO . print =<< need "PATH"
+  liftIO . print =<< need "HERCULES_CI_SECRETS_JSON"
 
   branchName <- need' "branchName" pure
   ghPages <- need' "gh-pages" pure
