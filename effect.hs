@@ -2,11 +2,14 @@
 
 module Main (main) where
 
+import Prelude hiding (FilePath)
+
 import Data.Aeson (FromJSON(parseJSON), eitherDecodeFileStrict', withObject, (.:))
+import Data.Either (fromRight)
 import Data.Text (Text)
 import qualified Data.Text as Text (unpack)
 import Text.URI
-import Turtle (MonadIO, fromText)
+import Turtle (FilePath, MonadIO, fromText, toText)
 import Turtle.Prelude
 import Turtle.Shell (FoldShell(FoldShell), foldShell, sh, liftIO)
 
@@ -37,6 +40,7 @@ shellStdoutNonEmpty =
     False
     pure
 
+ghPagesDir :: FilePath
 ghPagesDir = "gh-pages"
 
 main :: IO ()
@@ -61,7 +65,7 @@ main = sh do
     procs "git" ["init", "--initial-branch", branchName] mempty
     procs "git" ["remote", "add", "origin", render origin] mempty
   else do
-    procs "git" ["clone", "--branch", branchName, "--single-branch", render origin, ghPagesDir] mempty
+    procs "git" ["clone", "--branch", branchName, "--single-branch", render origin, fromRight (error "impossible") (toText ghPagesDir)] mempty
     cd ghPagesDir
   let currentGit = ".git"
       backupGit = "../.git"
