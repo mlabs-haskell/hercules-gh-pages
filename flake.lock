@@ -81,15 +81,15 @@
         "nixpkgs": "nixpkgs_2"
       },
       "locked": {
-        "lastModified": 1674593064,
-        "narHash": "sha256-0xux7ivDAZhFxOowja4SjSzI17hV9aUgS0KptZ+kKJQ=",
-        "owner": "Mr-Andersen",
+        "lastModified": 1674152863,
+        "narHash": "sha256-Y5ROi4LeBT07tejuteHS1FeLUlsjgMJ9IC9Yo8GaN1U=",
+        "owner": "hercules-ci",
         "repo": "hercules-ci-effects",
-        "rev": "e679fb94499b2024d66449c5e5f03ddc9fe2f885",
+        "rev": "c6c39dde5892d3cb8b4e81e851e21353c6c30506",
         "type": "github"
       },
       "original": {
-        "owner": "Mr-Andersen",
+        "owner": "hercules-ci",
         "repo": "hercules-ci-effects",
         "type": "github"
       }
