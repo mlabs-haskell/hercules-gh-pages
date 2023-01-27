@@ -58,7 +58,7 @@
       packages.${system}.gh-pages = pkgs.runCommandNoCC "generate-gh-pages" { }
         ''
           mkdir $out
-          echo "<h1>This is a GH page (ed. 4)</h1>" > $out/index.html
+          echo "<h1>This is a GH page (ed. 5)</h1>" > $out/index.html
         '';
 
       herculesCI = pkgs.mkGhPagesJob {

@@ -59,6 +59,7 @@ main = sh do
   gitTokenPassword <- mkPassword gitToken
   authority <- fromRightM $ uriAuthority remoteHttpUrl
   let origin = remoteHttpUrl { uriAuthority = Right authority { authUserInfo = Just UserInfo { uiUsername = owner, uiPassword = Just gitTokenPassword } } }
+  pwd >>= liftIO . print
 
   if rewriteHistory then do
     mkdir ghPagesDir
@@ -71,6 +72,9 @@ main = sh do
 
   let currentGit = ".git"
       backupGit = "/build/git-backup"
+
+  pwd >>= liftIO . print
+  ls "." >>= print
 
   mv currentGit backupGit
   ls "." >>= rmtree
