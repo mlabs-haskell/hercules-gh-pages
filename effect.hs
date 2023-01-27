@@ -6,13 +6,13 @@ import Prelude hiding (FilePath)
 
 import Data.Aeson (FromJSON(parseJSON), eitherDecodeFileStrict', withObject, (.:))
 import Data.Either (fromRight)
-import Data.Foldable (for_, traverse_)
+import Data.Foldable (for_)
 import Data.Text (Text)
 import qualified Data.Text as Text (unpack)
 import Text.URI
 import Turtle (FilePath, MonadIO, toText)
 import Turtle.Prelude
-import Turtle.Shell (FoldShell(FoldShell), foldShell, sh, liftIO)
+import Turtle.Shell (Shell, FoldShell(FoldShell), foldShell, sh, liftIO)
 
 need' :: (MonadIO m, MonadFail m) => Text -> m Text
 need' e = do
@@ -41,8 +41,8 @@ shellStdoutNonEmpty =
     False
     pure
 
-collectLines :: FoldShell a [a]
-collectLines =
+collectLines :: Shell a -> Shell [a]
+collectLines s = foldShell s $
   FoldShell
     (\acc line -> pure (line : acc))
     []
@@ -67,7 +67,6 @@ main = sh do
   gitTokenPassword <- mkPassword gitToken
   authority <- fromRightM $ uriAuthority remoteHttpUrl
   let origin = remoteHttpUrl { uriAuthority = Right authority { authUserInfo = Just UserInfo { uiUsername = owner, uiPassword = Just gitTokenPassword } } }
-  pwd >>= liftIO . print
 
   if rewriteHistory then do
     mkdir ghPagesDir
@@ -83,7 +82,7 @@ main = sh do
 
   mv currentGit backupGit
 
-  files <- foldShell (ls ".") collectLines
+  files <- collectLines $ ls "."
   for_ files rmtree
 
   echo "Removed trees"
