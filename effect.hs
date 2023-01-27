@@ -78,6 +78,9 @@ main = sh do
 
   mv currentGit backupGit
   ls "." >>= rmtree
+
+  echo "Removed trees"
+
   procs "cp" ["-r", "--no-preserve=mode", "-T", ghPages, "."] mempty
   -- cptreeL (fromText ghPages) "."
   mv backupGit currentGit
