@@ -61,6 +61,10 @@
           echo "<h1>This is a GH page (ed. 2)</h1>" > $out/index.html
         '';
 
-      herculesCI = pkgs.mkGhPagesJob { inherit (self.packages.${system}) gh-pages; rewriteHistory = false; };
+      herculesCI = pkgs.mkGhPagesJob {
+        inherit (self.packages.${system}) gh-pages;
+        rewriteHistory = false;
+        condition = _: true;
+      };
     };
 }

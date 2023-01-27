@@ -9,7 +9,7 @@ import Data.Either (fromRight)
 import Data.Text (Text)
 import qualified Data.Text as Text (unpack)
 import Text.URI
-import Turtle (FilePath, MonadIO, fromText, toText)
+import Turtle (FilePath, MonadIO, toText)
 import Turtle.Prelude
 import Turtle.Shell (FoldShell(FoldShell), foldShell, sh, liftIO)
 
@@ -59,6 +59,7 @@ main = sh do
   gitTokenPassword <- mkPassword gitToken
   authority <- fromRightM $ uriAuthority remoteHttpUrl
   let origin = remoteHttpUrl { uriAuthority = Right authority { authUserInfo = Just UserInfo { uiUsername = owner, uiPassword = Just gitTokenPassword } } }
+  pwd >>= liftIO . print
   if rewriteHistory then do
     mkdir ghPagesDir
     cd ghPagesDir
@@ -69,6 +70,7 @@ main = sh do
     cd ghPagesDir
   let currentGit = ".git"
       backupGit = "/build/git-backup"
+  pwd >>= liftIO . print
   mv currentGit backupGit
   ls "." >>= rmtree
   procs "cp" ["-r", "--no-preserve=mode", "-T", ghPages, "."] mempty
