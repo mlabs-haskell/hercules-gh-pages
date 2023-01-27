@@ -74,7 +74,7 @@ main = sh do
       backupGit = "/build/git-backup"
 
   pwd >>= liftIO . print
-  ls "." >>= print
+  ls "." >>= liftIO . print
 
   mv currentGit backupGit
   ls "." >>= rmtree
