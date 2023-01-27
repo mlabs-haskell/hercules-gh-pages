@@ -6,6 +6,7 @@ import Prelude hiding (FilePath)
 
 import Data.Aeson (FromJSON(parseJSON), eitherDecodeFileStrict', withObject, (.:))
 import Data.Either (fromRight)
+import Data.Foldable (for_, traverse_)
 import Data.Text (Text)
 import qualified Data.Text as Text (unpack)
 import Text.URI
@@ -39,6 +40,13 @@ shellStdoutNonEmpty =
     (\acc line -> pure (acc || line /= mempty))
     False
     pure
+
+collectLines :: FoldShell a [a]
+collectLines =
+  FoldShell
+    (\acc line -> pure (line : acc))
+    []
+    (pure . reverse)
 
 ghPagesDir :: FilePath
 ghPagesDir = "gh-pages"
@@ -74,10 +82,12 @@ main = sh do
       backupGit = "/build/git-backup"
 
   pwd >>= liftIO . print
-  ls "." >>= liftIO . print
+  foldShell (ls ".") collectLines >>= traverse_ (liftIO . print)
 
   mv currentGit backupGit
-  ls "." >>= rmtree
+
+  files <- foldShell (ls ".") collectLines
+  for_ files rmtree
 
   echo "Removed trees"
 
