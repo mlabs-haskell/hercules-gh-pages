@@ -68,7 +68,7 @@ main = sh do
     procs "git" ["clone", "--branch", branchName, "--single-branch", render origin, fromRight (error "impossible") (toText ghPagesDir)] mempty
     cd ghPagesDir
   let currentGit = ".git"
-      backupGit = "../.git"
+      backupGit = "/build/git-backup"
   mv currentGit backupGit
   ls "." >>= rmtree
   procs "cp" ["-r", "--no-preserve=mode", "-T", ghPages, "."] mempty
