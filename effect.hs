@@ -81,9 +81,6 @@ main = sh do
   let currentGit = ".git"
       backupGit = "/build/git-backup"
 
-  pwd >>= liftIO . print
-  foldShell (ls ".") collectLines >>= traverse_ (liftIO . print)
-
   mv currentGit backupGit
 
   files <- foldShell (ls ".") collectLines
