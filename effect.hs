@@ -59,7 +59,7 @@ main = sh do
   gitTokenPassword <- mkPassword gitToken
   authority <- fromRightM $ uriAuthority remoteHttpUrl
   let origin = remoteHttpUrl { uriAuthority = Right authority { authUserInfo = Just UserInfo { uiUsername = owner, uiPassword = Just gitTokenPassword } } }
-  pwd >>= liftIO . print
+
   if rewriteHistory then do
     mkdir ghPagesDir
     cd ghPagesDir
@@ -68,9 +68,10 @@ main = sh do
   else do
     procs "git" ["clone", "--branch", branchName, "--single-branch", render origin, fromRight (error "impossible") (toText ghPagesDir)] mempty
     cd ghPagesDir
+
   let currentGit = ".git"
       backupGit = "/build/git-backup"
-  pwd >>= liftIO . print
+
   mv currentGit backupGit
   ls "." >>= rmtree
   procs "cp" ["-r", "--no-preserve=mode", "-T", ghPages, "."] mempty
